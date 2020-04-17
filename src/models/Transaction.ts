@@ -12,7 +12,7 @@ import Category from './Category';
 
 @Entity('transactions')
 class Transaction {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
@@ -21,20 +21,20 @@ class Transaction {
   @Column()
   type: 'income' | 'outcome';
 
-  @Column()
+  @Column('numeric')
   value: number;
 
-  @Column()
+  @Column({ select: false })
   category_id: string;
 
   @ManyToOne(() => Category)
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ select: false })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ select: false })
   updated_at: Date;
 }
 
