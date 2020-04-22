@@ -19,37 +19,32 @@ class CreateTransactionService {
     type,
     category,
   }: Request): Promise<Transaction> {
-    let savedCategory;
-
     const transactionsRepository = getCustomRepository(TransactionsRepository);
-    const categoriesRepository = getRepository(Category);
+    const categoryRepository = getRepository(Category);
 
-    if (type === 'outcome') {
-      const balance = await transactionsRepository.getBalance();
-      if (value > balance.total) {
-        throw new AppError('There is not enough value for this transaction');
-      }
+    const { total } = await transactionsRepository.getBalance();
+
+    if (type === 'outcome' && total < value) {
+      throw new AppError('There is not enough value for this transaction');
     }
 
-    // Verifico se a categoria existe
-    const categoryExists = await categoriesRepository.findOne({
+    let transactionCategory = await categoryRepository.findOne({
       where: { title: category },
     });
 
-    if (categoryExists) {
-      savedCategory = categoryExists;
-    } else {
-      const createdCategory = await categoriesRepository.create({
+    if (!transactionCategory) {
+      transactionCategory = await categoryRepository.create({
         title: category,
       });
-      savedCategory = await categoriesRepository.save(createdCategory);
+
+      await categoryRepository.save(transactionCategory);
     }
 
     const transaction = transactionsRepository.create({
       title,
       type,
       value,
-      category: savedCategory,
+      category: transactionCategory,
     });
 
     await transactionsRepository.save(transaction);

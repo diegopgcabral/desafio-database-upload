@@ -4,19 +4,17 @@ import AppError from '../errors/AppError';
 
 import Transaction from '../models/Transaction';
 
-interface Request {
-  id: string;
-}
 class DeleteTransactionService {
-  public async execute({ id }: Request): Promise<void> {
+  public async execute(id: string): Promise<void> {
     const transactionsRepository = getRepository(Transaction);
 
     const transaction = await transactionsRepository.findOne(id);
+
     if (!transaction) {
-      throw new AppError('Transaction does not exists.');
+      throw new AppError('Transaction does not exist.');
     }
 
-    await transactionsRepository.delete(id);
+    await transactionsRepository.remove(transaction);
   }
 }
 
