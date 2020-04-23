@@ -24,17 +24,17 @@ class Transaction {
   @Column('decimal')
   value: number;
 
-  @ManyToOne(() => Category)
+  @Column()
+  category_id: string;
+
+  @ManyToOne(() => Category) // , category => category.transaction, { eager: true })
   @JoinColumn({ name: 'category_id' })
   category: Category;
 
-  @Column({ select: false })
-  category_id: string;
-
-  @CreateDateColumn({ select: false })
+  @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn({ select: false })
+  @UpdateDateColumn()
   updated_at: Date;
 }
 
